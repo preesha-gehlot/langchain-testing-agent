@@ -135,7 +135,7 @@ class DescribeTableTool(BaseMCPTool):
     args_schema: type[BaseModel] = DescribeTableInput
 
     async def _arun(self, table_name, **kwargs) -> Dict[str, Any]:
-        """Call the list-tables tool on MCP server"""
+        """Call the describe-tables tool on MCP server"""
         tools_logger.info("Calling describe table via MCP protocol")
         
         result = await self._call_mcp_tool("describe-table", {"table_name": table_name})
@@ -147,6 +147,8 @@ class DescribeTableTool(BaseMCPTool):
         # Extract table information from MCP response
         data = result.get("data", {})
         rows = _extract_rows(data)
+
+        tools_logger.info(f"Described table {table_name} with columns: {rows}")
 
         return {"status": "success", "data": rows}
 
@@ -165,7 +167,7 @@ class ExecuteSQLTool(BaseMCPTool):
           Each row represents one row in the SQL query result. 
           - message: str error details (present when status == "error")
     """
-    args_schema: type[BaseModel] = DescribeTableInput
+    args_schema: type[BaseModel] = ExecuteSQLInput
 
     async def _arun(self, query, **kwargs) -> Dict[str, Any]:
         """Call the list-tables tool on MCP server"""
@@ -183,8 +185,56 @@ class ExecuteSQLTool(BaseMCPTool):
 
         return {"status": "success", "data": rows}
 
+class MarkCompleteInput(BaseModel):
+    status: str = Field(
+        description="Status of the task: 'found' if data was successfully retrieved, 'failed' if unable to find the data"
+    )
+    reasoning: str = Field(
+        description="Brief explanation of why marking as complete (what was found or why it failed)"
+    )
+
+class MarkCompleteTool(BaseTool):
+    """Mark the data search task as complete."""
+    
+    name: str = "mark_complete"
+    description: str = """
+    Mark the current data search task as complete.
+    
+    Use this when:
+    - You've successfully found the requested data (status='found')
+    - You've exhausted all options and cannot find the data (status='failed')
+    
+    Args:
+        status: 'found' or 'failed'
+        reasoning: Explanation of what was found or why the search failed
+    
+    Returns:
+        A dict confirming the completion status
+    """
+
+    args_schema: type[BaseModel] = MarkCompleteInput
+    
+    def _run(self, status: str, reasoning: str, **kwargs) -> Dict[str, Any]:
+        """Mark task as complete"""
+        tools_logger.info(f"Marking task as {status}: {reasoning}")
+        
+        if status not in ["found", "failed"]:
+            return {
+                "status": "error",
+                "message": f"Invalid status '{status}'. Must be 'found' or 'failed'"
+            }
+        
+        return {
+            "status": status,
+            "reasoning": reasoning
+        }
+    
+    async def _arun(self, status: str, reasoning: str, **kwargs) -> Dict[str, Any]:
+        """Async version - just calls sync version since no async work needed"""
+        return self._run(status, reasoning, **kwargs)
 
 # Create the tool instance
+mark_complete_tool = MarkCompleteTool()
 list_tables_tool = ListTablesTool()
 describe_table_tool = DescribeTableTool()
 execute_sql_tool = ExecuteSQLTool()
