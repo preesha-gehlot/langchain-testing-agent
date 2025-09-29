@@ -17,7 +17,7 @@ from logging_utils import setup_logging
 # Get a logger for this tools module using our improved setup
 tools_logger = setup_logging(__name__)
 
-def validate_openapi_spec(state: AgentState) -> Command[Literal["generate_new_postman_tests_with_data", "generate_new_postman_collection", "__end__"]]:
+def validate_openapi_spec(state: AgentState) -> Command[Literal["generate_new_postman_tests_with_data", "generate_new_postman_collection", "enhance_postman_collection", "__end__"]]:
     """
     Validates an OpenAPI specification file.
     
