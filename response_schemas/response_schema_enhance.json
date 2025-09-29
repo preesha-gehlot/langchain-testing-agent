@@ -1,0 +1,102 @@
+{
+    "type": "object",
+    "title": "PostmanTestCases",
+    "description": "A list of Postman test cases",
+    "properties": {
+        "test_cases": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {"type": "string"},
+                    "event": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "listen": {"type": "string"},
+                                "script": {
+                                    "type": "object",
+                                    "properties": {
+                                        "exec": {
+                                            "type": "array",
+                                            "items": {"type": "string"}
+                                        },
+                                        "type": {"type": "string"}
+                                    },
+                                    "required": ["exec", "type"],
+                                    "additionalProperties": false
+                                }
+                            },
+                            "required": ["listen", "script"],
+                            "additionalProperties": false
+                        }
+                    },
+                    "request": {
+                        "type": "object",
+                        "properties": {
+                            "method": {
+                                "type": "string",
+                                "enum": ["GET", "POST", "PUT", "DELETE", "PATCH"]
+                            },
+                            "header": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "key": {"type": "string"},
+                                        "value": {"type": "string"}
+                                    },
+                                    "required": ["key", "value"],
+                                    "additionalProperties": false
+                                }
+                            },
+                            "url": {
+                                "type": "object",
+                                "properties": {
+                                    "raw": {"type": "string"},
+                                    "host": {
+                                        "type": "array",
+                                        "items": {"type": "string"}
+                                    },
+                                    "path": {
+                                        "type": "array",
+                                        "items": {"type": "string"}
+                                    },
+                                    "query": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "key": {"type": "string"},
+                                                "value": {"type": "string"}
+                                            },
+                                            "required": ["key", "value"],
+                                            "additionalProperties": false
+                                        }
+                                    }
+                                },
+                                "required": ["raw", "host", "path", "query"],
+                                "additionalProperties": false
+                            }
+                        },
+                        "required": ["method", "header", "url"],
+                        "additionalProperties": false
+                    },
+                    "response": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {},
+                            "additionalProperties": false
+                        }
+                    }
+                },
+                "required": ["name", "event", "request", "response"],
+                "additionalProperties": false
+            }
+        }
+    },
+    "required": ["test_cases"],
+    "additionalProperties": false
+}

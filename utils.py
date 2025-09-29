@@ -10,6 +10,7 @@ logger = setup_logging(__name__)
 
 # SPEC VALIDATION UTILITY FUNCTIONS 
 def validate_json_spec(spec_path: str) -> Dict:
+    spec = None
     try:
         if not spec_path:
             logger.error("No OpenAPI spec URL provided in session state.")
@@ -28,6 +29,7 @@ def validate_json_spec(spec_path: str) -> Dict:
         validation_status = "success"
         validation_result = "valid"
         validation_message = "OpenAPI specification is valid."
+        spec = spec_json
 
     except json.JSONDecodeError as e:
         validation_status =  "error",
@@ -44,7 +46,8 @@ def validate_json_spec(spec_path: str) -> Dict:
     validation_json = {
         "status": validation_status, 
         "result": validation_result, 
-        "message": validation_message
+        "message": validation_message,
+        "spec": spec
     }
     
     return validation_json

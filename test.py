@@ -1,31 +1,23 @@
-from requirements_agent import requirements_sourcing_agent
-from dotenv import load_dotenv
-import os
-load_dotenv()
-
-print("Testing Requirements Sourcing Agent")
-print("=" * 50)
-
-# Test scenario
-test_scenario = """
-In the TFL JourneyResults endpoint, if the journey is from a station in London that accepts oyster cards to a station in London that does not accept oyster cards, when the mode parameter is set to tube, the endpoint should return a 400 response.
-"""
-
-print(f"Test Scenario: {test_scenario.strip()}")
-print("\nRunning agent...")
-
-# Invoke the agent with correct state structure
-try:
-    result = requirements_sourcing_agent.invoke({
-        "test_data_scenario": test_scenario.strip()
-    })
+from postman_agent import postman_agent
+# "In the TFL JourneyResults endpoint, if the journey is from a station in London that accepts oyster cards to a station in London that does not accept oyster cards, when the mode parameter is set to tube, the endpoint should return a 400 response.",
     
-    print("\nAgent execution completed successfully!")
-    print(f"\nGenerated lookup requests: {len(result.get('lookup_requests', []))}")
-    for i, lookup in enumerate(result.get('lookup_requests', []), 1):
-        print(f"  {i}. {lookup}")
+initial_state = {
+    "task": "enhance_collection", # or "enhance_collection_with_data"
+    "spec_fpath": "downloads/tfl_journey_spec.json",
+    "api_name": "TFL JourneyResults API",
+    "existing_collection_fpath": "downloads/initial_postman_collection.json",
+    "test_data_scenario": "In the TFL JourneyResults endpoint, when the mode is set to an invalid value such as spaceship, the endpoint should return a 400 or 404 response. ",
+    "data_fpath": "./artifacts/lookups_result_1759139776.txt"
+}
     
-except Exception as e:
-    print(f"\nError running agent: {e}")
-    import traceback
-    traceback.print_exc()
+print("Starting agent execution...")
+print(f"Initial state: {initial_state}\n")
+
+# Run the agent synchronously
+result = postman_agent.invoke(initial_state)
+
+print("\n=== Agent Execution Complete ===")
+print(f"Status: {result['status']}")
+print(f"Reasoning: {result['reasoning']}")
+if result.get('generated_collection_fpath'):
+    print(f"Generated collection saved to: {result['generated_collection_fpath']}")

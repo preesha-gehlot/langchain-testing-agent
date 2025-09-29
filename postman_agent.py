@@ -1,15 +1,23 @@
-from langchain.tools import tool
-from typing import Dict, Optional
+import json
+from dotenv import load_dotenv
+load_dotenv()
+
 import os
 from google.cloud import storage
-from logging_utils import setup_logging
+from states import AgentState
 from utils import validate_json_spec
+from typing_extensions import Literal
+from langgraph.types import Command
+from langgraph.graph import StateGraph, START, END
+from create_collection import generate_new_postman_collection
+from enhance_with_data_collection import generate_new_postman_tests_with_data
+from enhance_collection import enhance_postman_collection
+from logging_utils import setup_logging
 
 # Get a logger for this tools module using our improved setup
 tools_logger = setup_logging(__name__)
 
-
-def validate_openapi_spec(spec_path: str) -> Dict:
+def validate_openapi_spec(state: AgentState) -> Command[Literal["generate_new_postman_tests_with_data", "generate_new_postman_collection", "__end__"]]:
     """
     Validates an OpenAPI specification file.
     
@@ -19,27 +27,46 @@ def validate_openapi_spec(spec_path: str) -> Dict:
     Returns:
         Dict containing validation status and results
     """
+    spec_path = state["spec_fpath"]
     tools_logger.info(f"Validating OpenAPI spec at: {spec_path}")
     
-    try:
-        validation_json = validate_json_spec(spec_path)
-        
-        if validation_json["status"] == "success":
-            tools_logger.info(f"OpenAPI spec from {spec_path} is valid.")
+    
+    validation_json = validate_json_spec(spec_path)
+    
+    if validation_json["status"] == "success":
+        tools_logger.info(f"OpenAPI spec from {spec_path} is valid.")
+        if state["task"] == "create_collection":
+            return Command(
+                goto="generate_new_postman_collection"
+            )
+        elif state["task"] == "enhance_collection_with_data": 
+            return Command(
+                goto="generate_new_postman_tests_with_data"
+            )
+        elif state["task"] == "enhance_collection":
+            return Command(
+                goto="enhance_postman_collection"
+            )
         else:
-            tools_logger.warning(f"OpenAPI spec validation failed: {validation_json}")
-            
-        return validation_json
-        
-    except Exception as e:
-        tools_logger.error(f"Error validating OpenAPI spec: {e}")
-        return {
-            "status": "error",
-            "message": f"Validation failed with error: {str(e)}"
-        }
+            return Command(
+                goto=END,
+                update={
+                    "status": "error",
+                    "reasoning": f"Unknown task: {state['task']}"
+                }
+            )
+    else:
+        tools_logger.warning(f"OpenAPI spec validation failed: {validation_json}")
+        return Command(
+            goto=END,
+            update={
+                "status": "error",
+                "reasoning": f"OpenAPI spec validation failed: {validation_json}"
+            }
+        )
+      
 
-
-def upload_to_gcp_bucket(file_path: str, api_name: str, bucket_name: Optional[str] = None) -> Dict:
+def upload_to_gcp_bucket(state: AgentState):
     """
     Uploads a file to a Google Cloud Storage bucket.
     
@@ -51,22 +78,13 @@ def upload_to_gcp_bucket(file_path: str, api_name: str, bucket_name: Optional[st
     Returns:
         Dict containing upload status and messages
     """
-    if not os.path.exists(file_path):
-        return {
-            "success": False,
-            "message": f"File not found: {file_path}"
-        }
+    file_path = state["generated_collection_fpath"]
+    api_name = state["api_name"]
     
     try:
         # Initialize the client
         client = storage.Client()
-        bucket_name = bucket_name or os.getenv('GCS_BUCKET_NAME')
-        
-        if not bucket_name:
-            return {
-                "success": False,
-                "message": "No bucket name provided and GCS_BUCKET_NAME environment variable not set"
-            }
+        bucket_name = os.getenv('GCS_BUCKET_NAME')
         
         bucket = client.bucket(bucket_name)
         file_name = os.path.basename(file_path)
@@ -80,15 +98,26 @@ def upload_to_gcp_bucket(file_path: str, api_name: str, bucket_name: Optional[st
         tools_logger.info(f"File uploaded to GCS: gs://{bucket_name}/{blob_path}")
         
         return {
-            "success": True,
-            "message": f"File uploaded successfully to gs://{bucket_name}/{blob_path}",
-            "gcs_path": f"gs://{bucket_name}/{blob_path}"
+            "status": "success",
+            "reasoning": f"New postman collection uploaded successfully to gs://{bucket_name}/{blob_path}"
         }
         
     except Exception as e:
-        tools_logger.error(f"Upload failed: {e}")
         return {
-            "success": False,
-            "message": f"Upload failed: {str(e)}"
+            "status": "error",
+            "reasoning": f"Upload failed: {str(e)}"
         }
 
+# ===== AGENT NODES =====
+postman_agent_builder = StateGraph(AgentState)
+# Add nodes to the graph
+postman_agent_builder.add_node("validate_openapi_spec", validate_openapi_spec)
+postman_agent_builder.add_node("generate_new_postman_tests_with_data", generate_new_postman_tests_with_data)
+postman_agent_builder.add_node("generate_new_postman_collection", generate_new_postman_collection)
+postman_agent_builder.add_node("enhance_postman_collection", enhance_postman_collection)
+postman_agent_builder.add_node("upload_to_gcp_bucket", upload_to_gcp_bucket)
+
+# Add edges to connect nodes
+postman_agent_builder.add_edge(START, "validate_openapi_spec")
+postman_agent_builder.add_edge("upload_to_gcp_bucket", END)
+postman_agent = postman_agent_builder.compile()
