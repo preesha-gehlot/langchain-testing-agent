@@ -116,15 +116,15 @@ def run_lookups(state:AgentState):
 
 # GRAPH CONSTRUCTION
 # Nodes
-requirements_builder = StateGraph(AgentState)
-requirements_builder.add_node("get_requirements", get_requirements)
-requirements_builder.add_node("list_tables", list_tables)
-requirements_builder.add_node("run_lookups", run_lookups)
+test_data_builder = StateGraph(AgentState)
+test_data_builder.add_node("get_requirements", get_requirements)
+test_data_builder.add_node("list_tables", list_tables)
+test_data_builder.add_node("run_lookups", run_lookups)
 
 # Edges
-requirements_builder.add_edge(START, "get_requirements")
-requirements_builder.add_edge("get_requirements", "list_tables")
-requirements_builder.add_edge("list_tables", "run_lookups")
-requirements_builder.add_edge("run_lookups", END)
+test_data_builder.add_edge(START, "get_requirements")
+test_data_builder.add_edge("get_requirements", "list_tables")
+test_data_builder.add_edge("list_tables", "run_lookups")
+test_data_builder.add_edge("run_lookups", END)
 
-requirements_sourcing_agent = requirements_builder.compile()
+test_data_agent = test_data_builder.compile()
