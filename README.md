@@ -1,5 +1,5 @@
 # Test case generation agent
-This is an initial POC, so this agent only handles unit test cases. 
+This is an initial POC, so this agent only handles unit test cases. While i had a very similar testing agent, based in Google ADK, this repo is heavily inspired by https://blog.langchain.com/open-deep-research/. 
 
 ## Data search agent ([data_agent.py](data_agent.py) and [database_tools.py](database_tools.py))
 
@@ -17,6 +17,8 @@ The data search agent is responsible for intelligently searching and retrieving 
 
 The agent iteratively uses these tools to understand the database structure and find the requested data, marking tasks as complete when data is found or when all options are exhausted.
 
+The Mark Complete Tool is conceptually very similar to the 'think tool' in Anthropic's deep research agent, essentially dynamically injecting the ability for the agent to stop and think about its actions, this allows the llm to essentially checkpoint itself at each stage, ensuring it does not end up in loops or go down one path without evaluating other options. 
+
 ![Data Search Agent](graphs/data_search_agent.png)
 
 ## Test data agent ([test_data_agent.py](test_data_agent.py))
@@ -27,6 +29,8 @@ The agent implements a three-stage workflow:
 1. **get_requirements**: Uses GPT-4o-mini with structured output to analyze test scenarios and identify what data needs to be looked up from the database
 2. **list_tables**: Retrieves available database tables using the MCP tools to understand what data sources are available
 3. **run_lookups**: For each identified data requirement, invokes the data search agent to find and retrieve the actual data from the database
+
+I saw many parallels with having a research orchestrator agent with sub agents for each sub research topic in the langchain article, and for testing with data I could have a test data agent that acts as an orchestrator, which can lauch sub agents (data search agents) to run lookups on the database. A task for the future would be to have these lookups run in parallel, since the task is read only, and each lookup requirement is conceptually separate this task is easily parallelizable. 
 
 The agent saves all retrieved data to timestamped artifact files, handling both successful lookups and failed attempts. This provides a comprehensive data foundation that can be used by downstream agents for generating realistic test cases with actual database content.
 
