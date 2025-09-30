@@ -1,0 +1,36 @@
+# Core web framework and API dependencies
+fastapi>=0.104.0
+uvicorn>=0.24.0
+
+# Async HTTP client and file operations
+aiohttp>=3.9.0
+aiofiles>=23.2.0
+
+# HTTP client library
+requests>=2.31.0
+
+# LangChain ecosystem
+langchain>=0.1.0
+langchain-core>=0.1.0
+langgraph>=0.1.0
+
+# Data validation and typing
+pydantic>=2.5.0
+typing-extensions>=4.8.0
+
+# Environment configuration
+python-dotenv>=1.0.0
+
+# Google Cloud services
+google-cloud-storage>=2.10.0
+
+# OpenAPI specification validation
+openapi-spec-validator>=0.7.0
+
+# Async utilities
+nest-asyncio>=1.5.0
+
+# Additional dependencies that might be needed
+# (uncomment if required based on your specific setup)
+langchain-openai>=0.1.0
+langchain-anthropic>=0.1.0

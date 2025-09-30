@@ -109,3 +109,7 @@ async def run_testing_agent(issue: IssueRequest):
 
     result = main_agent.invoke(initial_state)
     return result
+
+@app.get("/health")
+def health():
+    return {"status": "healthy"}
