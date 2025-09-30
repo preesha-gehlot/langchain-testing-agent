@@ -19,7 +19,7 @@ The agent iteratively uses these tools to understand the database structure and 
 
 The Mark Complete Tool is conceptually very similar to the 'think tool' in Anthropic's deep research agent, essentially dynamically injecting the ability for the agent to stop and think about its actions, this allows the llm to essentially checkpoint itself at each stage, ensuring it does not end up in loops or go down one path without evaluating other options. 
 
-![Data Search Agent](graphs/data_search_agent.png)
+<img src="graphs/data_search_agent.png" alt="Data Search Agent" width="150">
 
 ## Test data agent ([test_data_agent.py](test_data_agent.py))
 
@@ -34,7 +34,7 @@ I saw many parallels with having a research orchestrator agent with sub agents f
 
 The agent saves all retrieved data to timestamped artifact files, handling both successful lookups and failed attempts. This provides a comprehensive data foundation that can be used by downstream agents for generating realistic test cases with actual database content.
 
-![Test Data Agent](graphs/test_data_agent.png)
+<img src="graphs/test_data_agent.png" alt="Test Data Agent" width="320">
 
 ## Postman generation agent ([postman_agent.py](postman_agent.py))
 
