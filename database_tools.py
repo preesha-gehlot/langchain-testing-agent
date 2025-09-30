@@ -3,15 +3,28 @@ import asyncio
 import time
 import aiohttp
 import json
+import os
 from typing import Dict, Any
 from typing_extensions import Annotated
 from utils import _extract_rows
 from logging_utils import setup_logging
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
 # LangChain imports
 from langchain.tools import BaseTool
 from langgraph.prebuilt import InjectedState
 from pydantic import BaseModel, Field
 
+# Try to import nest_asyncio to handle nested event loops
+try:
+    import nest_asyncio
+    nest_asyncio.apply()
+    NEST_ASYNCIO_AVAILABLE = True
+except ImportError:
+    NEST_ASYNCIO_AVAILABLE = False
 
 tools_logger = setup_logging(__name__)
 
@@ -19,7 +32,7 @@ class BaseMCPTool(BaseTool):
     """Base class for all MCP tools with common functionality"""
     
     # Define the URL as a class variable that can be overridden
-    mcp_url: str = "https://mcp-toolbox-339727264964.europe-west2.run.app/mcp"
+    mcp_url: str = os.getenv('MCP_TOOLBOX_URL')
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -63,6 +76,13 @@ class BaseMCPTool(BaseTool):
     
     def _run(self, **kwargs) -> Dict[str, Any]:
         """Sync wrapper for async method"""
+        if not NEST_ASYNCIO_AVAILABLE:
+            raise RuntimeError(
+                "nest_asyncio is required but not available. "
+                "Please install it with: pip install nest-asyncio"
+            )
+        
+        # nest_asyncio allows nested event loops
         return asyncio.run(self._arun(**kwargs))
 
 # Input schema for the tool

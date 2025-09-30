@@ -3,3 +3,5 @@ __pycache__/
 .env
 google_application_credentials.json
 *.txt
+.DS_Store
+.vscode/
