@@ -55,6 +55,22 @@ The agent ensures that generated Postman collections are comprehensive, include 
 
 ![Postman Generation Agent](graphs/postman_generation_agent.png)
 
+## FastAPI Application Entry Point ([main.py](main.py))
+
+The `main.py` file serves as the primary entry point for the testing agent system, providing a FastAPI web service that integrates with Jira to automate test collection generation workflows.
+
+### Key Features:
+**Jira Integration**: The application downloads attachments directly from Jira issues, including:
+- OpenAPI specifications
+- Existing Postman collections
+- User requirement documents
+
+**API Endpoints**:
+- `POST /run-testing-agent/`: Main endpoint that accepts Jira issue data, downloads required attachments, and orchestrates the entire testing pipeline through the main agent
+- `GET /health`: Simple health check endpoint
+
+The application acts as a bridge between Jira workflows and the LangGraph-based agent system, enabling automated test generation to be triggered directly from Jira issues with all necessary context and files automatically retrieved and processed.
+
 ## Main agent ([main_agent.py](main_agent.py))
 
 The main agent serves as the orchestrator that coordinates the test data agent and postman generation agent based on the specific testing requirements. It implements intelligent workflow routing to optimize the testing pipeline.
