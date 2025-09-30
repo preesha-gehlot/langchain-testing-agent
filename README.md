@@ -70,3 +70,5 @@ This architecture ensures efficient resource utilization - the potentially expen
 
 ![Main Agent](graphs/main_agent.png)
 
+N.B. Langchain is definitely more complex to use than ADK, but that was a given since less details are abstracted away. But as we begin to build workflow agents with more complex functionality, I believe we're going to need to be able to create agents where the logic is composed of sections of deterministic code and sections of LLMs with tool calls. Relying on agents to execute the deterministic parts of our workflow is unecessary, for now, I feel that we should be assinging these LLMs with minimal and focused responsibilities, giving them only what they really need to be able to - that is where langchain works really well. Of course, this may all be common knowledge, but the more we share, the more we learn. I'd be interested in exploring how we might establish some patterns or guidelines for when to use deterministic code versus agentic behavior as our workflows grow in complexity.
+
