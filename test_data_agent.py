@@ -105,12 +105,14 @@ def run_lookups(state:AgentState):
     
     filename = f"lookups_result_{int(time.time())}.txt"
     os.makedirs("./artifacts", exist_ok=True)
+
+    path = f"./artifacts/{filename}"
     
     # Save the file
-    with open(f"./artifacts/{filename}", 'w', encoding='utf-8') as f:
+    with open(path, 'w', encoding='utf-8') as f:
         f.write(final_text)
 
-    return {"data_filepath":filename}
+    return {"data_fpath":path}
 
 
 

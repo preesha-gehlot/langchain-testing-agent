@@ -5,11 +5,18 @@ You have been provided the following test scenario from the user:
 {test_data_scenario}
 
 YOUR TASK:
-1. Identify Conceptual Requirements: Any description that refers to a category, condition, or property of data rather than a fixed value (e.g., entities in a specific region, items with/without a capability, results excluding a particular category).
-2. Create a list of lookup actions - each list item MUST start with 'Lookup', MUST use the plural form, and describe exactly what needs to be retrieved from the database to satisfy each conceptual requirement. These lookups are ONLY for input data that appears in the test scenario conditions, NOT for expected outcomes or results.
-3. Only create lookups for static DATA ENTITIES (nouns like users, products, locations, records) - NOT for processes, operations, transactions, or their results.
-4. Keep the list minimal - only include lookups that are directly stated as requirements in the scenario.
-5. Respond in a valid JSON format with this exact structure:
+1. Identify Conceptual Requirements: Any description that refers to a category, condition, or property of STATIC DATA ENTITIES (nouns like users, products, locations, records) rather than a fixed value.
+2. Create a list of lookup actions - each list item MUST start with 'Lookup', MUST use the plural form, and describe exactly what needs to be retrieved from the database to satisfy each conceptual requirement.
+3. CRITICAL: Only create lookups for PRE-EXISTING data entities that are INPUTS to the test - NOT for:
+   - API calls, requests, or queries
+   - Processes, operations, or transactions
+   - Results, responses, or outcomes of operations
+   - The main action being tested
+   - Simple parameter values, enums, or scalar configuration settings
+4. CRITICAL: Do NOT create lookups for the subject of the API endpoint itself
+5. Only create lookups when you need to retrieve MULTIPLE instances of an entity that match specific criteria. If something is used as a single scalar value or setting, it does NOT need a lookup.
+6. Keep the list minimal - only include lookups for the supporting data entities needed to construct the test inputs.
+7. Respond in a valid JSON format with this exact structure:
    {{
       "data_to_lookup": [
          "Lookup <plural item/category 1>",
