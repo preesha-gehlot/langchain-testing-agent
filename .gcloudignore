@@ -1,0 +1,17 @@
+# .gcloudignore
+.git/
+.gitignore
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.DS_Store
+venv/
+*.md
+.vscode/
+.pytest_cache/
+*.log
+graphs/
+
+# Explicitly include credentials (by NOT ignoring them)
+# google_application_credentials.json should NOT be in this list
