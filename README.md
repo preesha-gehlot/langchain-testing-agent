@@ -10,7 +10,6 @@ The data search agent is responsible for intelligently searching and retrieving 
 - `tool_node`: Executes database tools and handles the results, updating the agent state accordingly
 
 **database_tools.py**: Provides a suite of database interaction tools that communicate with a remote database via MCP (Model Context Protocol):
-- `ListTablesTool`: Retrieves all available tables and their descriptions from the database
 - `DescribeTableTool`: Gets the schema information for a specific table
 - `ExecuteSQLTool`: Executes SQL queries on the database and returns results
 - `MarkCompleteTool`: Marks a data search task as complete with success/failure status
@@ -27,7 +26,7 @@ The test data agent orchestrates the process of generating test data for specifi
 
 The agent implements a three-stage workflow:
 1. **get_requirements**: Uses GPT-4o-mini with structured output to analyze test scenarios and identify what data needs to be looked up from the database
-2. **list_tables**: Retrieves available database tables using the MCP tools to understand what data sources are available
+2. **list_tables**: Retrieves available database tables using the MCP tool `ListTablesTool` to understand what data sources are available. The tool `ListTablesTool` retrieves all available tables and their descriptions from the database
 3. **run_lookups**: For each identified data requirement, invokes the data search agent to find and retrieve the actual data from the database
 
 I saw many parallels with having a research orchestrator agent with sub agents for each sub research topic in the langchain article, and for testing with data I could have a test data agent that acts as an orchestrator, which can lauch sub agents (data search agents) to run lookups on the database. A task for the future would be to have these lookups run in parallel, since the task is read only, and each lookup requirement is conceptually separate this task is easily parallelizable. 
