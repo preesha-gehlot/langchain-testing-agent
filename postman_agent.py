@@ -48,6 +48,7 @@ def validate_openapi_spec(state: AgentState) -> Command[Literal["generate_new_po
                 goto="enhance_postman_collection"
             )
         elif state["task"] == "validate_openapi_spec":
+            tools_logger.info(f"Task to validate openapi spec was successful, finishing off the task")
             return Command(
                 goto=END,
                 update={

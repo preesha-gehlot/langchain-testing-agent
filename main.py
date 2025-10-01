@@ -39,8 +39,9 @@ task_mapping = {
     "Enhance Test Collection": "enhance_collection", 
     "Enhance Test Collection With Data": "enhance_collection_with_data",
     "Create Test Collection": "create_collection",
-    "Validate OpenAPI spec": "validate_openapi_spec"
-    }
+    "Validate OpenAPI spec": "validate_openapi_spec",
+    "Validate OpenAPI Spec": "validate_openapi_spec"  # Handle both capitalizations
+}
 
 # Jira credentials from environment
 JIRA_TOKEN = os.getenv("JIRA_API_TOKEN")
