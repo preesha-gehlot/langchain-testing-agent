@@ -26,6 +26,7 @@ def generate_new_postman_collection(state: AgentState) -> Command[Literal["uploa
     Returns:
         Dict containing the status of collection creation and relevant messages
     """
+    tools_logger.info("Creating new Postman collection from OpenAPI spec")
     date = datetime.now().strftime('%m/%d/%Y')
 
     spec_path = state["spec_fpath"]

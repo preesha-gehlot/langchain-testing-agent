@@ -18,6 +18,7 @@ tools_logger = setup_logging(__name__)
 
 def generate_new_postman_tests_with_data(state: AgentState) -> Command[Literal["upload_to_gcp_bucket", "__end__"]]:
     # Load output schema from file
+    tools_logger.info("generating new postman tests based on data")
     base_dir = os.path.dirname(os.path.abspath(__file__))
     schema_path = os.path.join(base_dir, 'response_schemas', 'response_schema_enhance.json')
     tools_logger.info(f"Loading Postman test case schema from: {schema_path}")
@@ -52,7 +53,6 @@ def generate_new_postman_tests_with_data(state: AgentState) -> Command[Literal["
         data_content=data_content
     )
     tools_logger.info("calling gpt to generate new test cases based on the data")
-    tools_logger.info(prompt)
 
     model = init_chat_model(
         model="gpt-4o",

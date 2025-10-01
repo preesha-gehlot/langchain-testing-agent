@@ -106,6 +106,8 @@ def enhance_postman_collection(state: AgentState) -> Command[Literal["upload_to_
         dict: Status and message about the enhancement process.
     """
 
+    tools_logger.info("Enhancing existing Postman collection with new test(s)")
+
     # Convert OpenAPI spec to JSON string
     spec_path = state["spec_fpath"]
     with open(spec_path, 'r') as f:
