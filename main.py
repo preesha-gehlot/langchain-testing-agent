@@ -80,8 +80,15 @@ async def run_testing_agent(issue: IssueRequest):
         task = task_mapping[issue.postmanAction]
     
         spec_file_path = await download_file(spec_attachment.contentUrl, spec_attachment.filename)
-        collection_file_path = await download_file(collection_attachment.contentUrl, collection_attachment.filename)
-        req_file_path = await download_file(req_attachment.contentUrl, req_attachment.filename)
+        
+        # Only download collection and requirements files if they exist
+        collection_file_path = None
+        if collection_attachment:
+            collection_file_path = await download_file(collection_attachment.contentUrl, collection_attachment.filename)
+            
+        req_file_path = None
+        if req_attachment:
+            req_file_path = await download_file(req_attachment.contentUrl, req_attachment.filename)
     
     except Exception as e:
         return {
@@ -90,12 +97,14 @@ async def run_testing_agent(issue: IssueRequest):
         }
 
     # Read the contents of the requirements file
-    try:
-        with open(req_file_path, 'r', encoding='utf-8') as f:
-            test_data_scenario = f.read()
-    except Exception as e:
-        logger.error(f"Failed to read requirements file: {e}")
-        test_data_scenario = ""
+    test_data_scenario = ""
+    if req_file_path:
+        try:
+            with open(req_file_path, 'r', encoding='utf-8') as f:
+                test_data_scenario = f.read()
+        except Exception as e:
+            logger.error(f"Failed to read requirements file: {e}")
+            test_data_scenario = ""
 
     initial_state = {
         "task": task, 
